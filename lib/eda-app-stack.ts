@@ -32,11 +32,10 @@ export class EDAAppStack extends cdk.Stack {
 
     // Integration infrastructure
 
-    // NEW
     const dlq = new sqs.Queue(this, "img-dlq", {
       receiveMessageWaitTime: cdk.Duration.seconds(6),
     });
-    // UPDATE
+
     const imageProcessQueue = new sqs.Queue(this, "img-process-q", {
       receiveMessageWaitTime: cdk.Duration.seconds(6),
       deadLetterQueue: {
@@ -106,6 +105,7 @@ export class EDAAppStack extends cdk.Stack {
     const newImageEventSource = new events.SqsEventSource(imageProcessQueue, {
       batchSize: 5,
       maxBatchingWindow: cdk.Duration.seconds(5),
+      reportBatchItemFailures: true,  // NEW
     });
 
     persistImageDataFn.addEventSource(newImageEventSource);
